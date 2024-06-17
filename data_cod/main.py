@@ -26,7 +26,11 @@ PATH_UC = os.environ['id_path']
 SCOPES=["https://www.googleapis.com/auth/drive"]
 
 
-def download_gsc(bucket, key):    
+def download_gcs(
+    bucket: str, 
+    key: str
+) -> str:
+        
     print(f"Downloading key: {key} in bucket: {bucket}")
     client = storage.Client.from_service_account_info(JSON_DICT)
     
@@ -106,13 +110,18 @@ def transfer_database_uc(event, context):
     bucket = event['bucket']
     key = event['name']
 
-    if key != 'ULTIMA_CHANCE/data.duckdb':
-        print(f'[NOT COPY] Key -- {key}, True: ULTIMA_CHANCE/data.duckdb')
+    files = [
+        'ULTIMA_CHANCE/data.duckdb', 
+        'RESSARCIMENTO/ressarcimento.duckdb'
+    ]
+
+    if key not in files:
+        print(f'[NOT COPY] Key -- {key}')
         return
 
     try:
 
-        local_path = download_gsc(bucket, key)
+        local_path = download_gcs(bucket, key)
         move_gcs_data(local_path, key)
 
     except Exception as e:
