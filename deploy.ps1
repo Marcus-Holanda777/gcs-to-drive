@@ -1,1 +1,0 @@
-gcloud functions deploy transfer_database_uc --timeout 540s --memory 8G --region us-east1 --entry-point transfer_database_uc --source data_cod --runtime python311 --service-account read-engenharia@engenharia-mvsh.iam.gserviceaccount.com --trigger-resource gs://datalake-mvsh --trigger-event google.storage.object.finalize --env-vars-file env.yaml
