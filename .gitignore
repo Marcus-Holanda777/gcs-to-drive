@@ -1,6 +1,8 @@
 venv
 /venv
 *.sh
+*.ps1
+*.bat
 *.yaml
 /__pycache__
 __pycache__
