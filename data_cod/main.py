@@ -13,7 +13,7 @@ import json
 SECRET_ID = os.environ['secret_id']
 PROJECT_IC = os.environ['project_id']
 PATH_UC = os.environ['id_path']
-SCOPES=["https://www.googleapis.com/auth/drive"]
+SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 
 JSON_DICT = json.loads(
