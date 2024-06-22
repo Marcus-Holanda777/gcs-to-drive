@@ -42,11 +42,12 @@ def download_gcs(
     return tmpdir
 
 
-def delete_files(service):
+def delete_files(service, name):
     results = (
         service
         .files()
         .list(
+            q=f"name = '{name}'",
             fields='files(id, name)'
         )
         .execute()
@@ -55,9 +56,8 @@ def delete_files(service):
     files = results.get('files', [])
 
     for file in files:
-        if file['name'] != 'ultima_chance':
-            service.files().delete(fileId=file['id']).execute()
-            print(f"Deleted {file['name']} (ID: {file['id']})")
+        service.files().delete(fileId=file['id']).execute()
+        print(f"Deleted {file['name']} (ID: {file['id']})")
 
 
 def move_gcs_data(
@@ -75,7 +75,7 @@ def move_gcs_data(
         service = build('drive', 'v3', credentials=creds)
         file_metadata = {"name": name, "parents": [PATH_UC]}
 
-        delete_files(service)
+        delete_files(service, name)
 
         mimetype, __ = mimetypes.guess_type(local_path)
         media = MediaFileUpload(
