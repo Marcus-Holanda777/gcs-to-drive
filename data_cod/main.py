@@ -63,7 +63,7 @@ def delete_files(service, name):
 def move_gcs_data(
     local_path: str,
     remote_path: str
-):
+) -> None:
 
     creds = service_account.Credentials.from_service_account_info(
         info=JSON_DICT,
