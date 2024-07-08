@@ -30,12 +30,12 @@ def etl_cadastro_uc(bucket, key):
     con.sql(f"""
         CREATE SECRET IF NOT EXISTS(
             TYPE gcs,
-            KEY_ID {KEY},
-            SECRET {SECRET}
+            KEY_ID '{KEY}',
+            SECRET '{SECRET}'
     );
     """)
 
-    con.sql(f"ATTACH {catalog} AS ultima_chance")
+    con.sql(f"ATTACH '{catalog}' AS ultima_chance")
     con.sql("USE ultima_chance;")
 
     # TODO: Criar tabela de conversao dos meses
@@ -201,6 +201,6 @@ def etl_cadastro_uc(bucket, key):
     # TODO: Exportar cadastro
     con.sql(f"""
         COPY (FROM memory.resumo_estoque())
-	    TO {catalog_to} (HEADER, DELIMITER ';');
+	    TO '{catalog_to}' (HEADER, DELIMITER ';');
     """
     )
