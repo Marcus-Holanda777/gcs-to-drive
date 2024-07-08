@@ -1,6 +1,6 @@
 import duckdb
 import os
-from data_cod.secret import access_secret_version
+from secret import access_secret_version
 
 DB_ID = os.environ['db_id']
 DB_SECRET = os.environ['db_secret']
