@@ -12,7 +12,7 @@ SECRET = access_secret_version(project_id=PROJECT_IC, secret_id=DB_SECRET, versi
 def etl_cadastro_uc(bucket, key):
     catalog = f'gc://{bucket}/{key}'
 
-    key_to = f'{key.split('/')[0]}/cadastro.csv'
+    key_to = f"{key.split('/')[0]}/cadastro.csv"
     catalog_to = f'gc://{bucket}/{key_to}'
 
     con = duckdb.connect(
