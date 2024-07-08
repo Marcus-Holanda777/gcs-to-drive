@@ -40,14 +40,14 @@ def etl_cadastro_uc(bucket, key):
 
     # TODO: Criar tabela de conversao dos meses
     con.sql("""
-        CREATE OR REPLACE TABLE month_brazilian (
+        CREATE OR REPLACE TABLE memory.month_brazilian (
 	        name VARCHAR,
 	        nome VARCHAR
 	 );""")
     
     # TODO: Inserir dados month_brazilian
     con.executemany(
-        "INSERT INTO month_brazilian VALUES(?, ?)",
+        "INSERT INTO memory.month_brazilian VALUES(?, ?)",
         [
             ('January','Janeiro'),
 		    ('February','Fevereiro'),
@@ -66,7 +66,7 @@ def etl_cadastro_uc(bucket, key):
 
     # TODO: Criar macro de perdas
     con.sql("""
-    CREATE OR REPLACE MACRO resumo_estoque(filtro := null)
+    CREATE OR REPLACE MACRO memory.resumo_estoque(filtro := null)
     AS TABLE 
     (
         WITH movs_kardex
@@ -145,7 +145,7 @@ def etl_cadastro_uc(bucket, key):
                 pf.prfi_qt_estindisp                              AS qtd_estoque_indisponivel_loja,
                 pf.prfi_vl_cmpcsicms                              AS preco_unit,
                 concat(
-                (SELECT nome FROM month_brazilian WHERE name = monthname(ulch_dt_vencimento))
+                (SELECT nome FROM memory.month_brazilian WHERE name = monthname(ulch_dt_vencimento))
                 , ' de ', 
                 YEAR(ulch_dt_vencimento)
                 ) AS mes_ano_de_data_emissao,
@@ -200,7 +200,7 @@ def etl_cadastro_uc(bucket, key):
 
     # TODO: Exportar cadastro
     con.sql(f"""
-        COPY (FROM resumo_estoque())
+        COPY (FROM memory.resumo_estoque())
 	    TO {catalog_to} (HEADER, DELIMITER ';');
     """
     )
