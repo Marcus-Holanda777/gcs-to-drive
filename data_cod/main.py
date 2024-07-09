@@ -38,7 +38,7 @@ def download_gcs(
     blob = source_bucket.blob(key)
     
     tmpdir = "/tmp/file"
-    blob.download_to_filename(tmpdir)
+    blob.download_to_filename(tmpdir, timeout=240)
     
     return tmpdir
 

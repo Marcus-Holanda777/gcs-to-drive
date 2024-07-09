@@ -9,11 +9,12 @@ PROJECT_IC = os.environ['project_id']
 KEY = access_secret_version(project_id=PROJECT_IC, secret_id=DB_ID, version_id=1)
 SECRET = access_secret_version(project_id=PROJECT_IC, secret_id=DB_SECRET, version_id=1)
 
+
 def etl_cadastro_uc(bucket, key):
-    catalog = f'gc://{bucket}/{key}'
+    catalog = f'gs://{bucket}/{key}'
 
     key_to = f"{key.split('/')[0]}/cadastro.csv"
-    catalog_to = f'gc://{bucket}/{key_to}'
+    catalog_to = f'gs://{bucket}/{key_to}'
 
     con = duckdb.connect(
         config={
@@ -34,8 +35,9 @@ def etl_cadastro_uc(bucket, key):
             SECRET '{SECRET}'
     );
     """)
-
-    con.sql(f"ATTACH '{catalog}' AS ultima_chance")
+    
+    # TODO: Anexar banco do GCS
+    con.sql(f"ATTACH '{catalog}' AS ultima_chance (READ_ONLY);")
     con.sql("USE ultima_chance;")
 
     # TODO: Criar tabela de conversao dos meses
@@ -66,7 +68,7 @@ def etl_cadastro_uc(bucket, key):
 
     # TODO: Criar macro de perdas
     con.sql("""
-    CREATE OR REPLACE MACRO memory.resumo_estoque(filtro := null)
+    CREATE OR REPLACE TEMP MACRO resumo_estoque(filtro := null)
     AS TABLE 
     (
         WITH movs_kardex
@@ -200,7 +202,7 @@ def etl_cadastro_uc(bucket, key):
 
     # TODO: Exportar cadastro
     con.sql(f"""
-        COPY (FROM memory.resumo_estoque())
+        COPY (FROM resumo_estoque())
 	    TO '{catalog_to}' (HEADER, DELIMITER ';');
     """
     )
