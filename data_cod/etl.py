@@ -116,7 +116,7 @@ def etl_cadastro_uc(bucket, key):
             SELECT 
                 fil.fili_cd_filial,
                 COALESCE(gr.codinome, 'ND')  AS gerente_regional,
-                COALESCE(gos.codinome, 'ND') AS gerente_operacional
+                COALESCE(gos.codinome, 'ND') AS gerente_operacional,
                 COALESCE(s.supervisor, 'ND') AS supervisor
             FROM filial AS fil
             LEFT JOIN assist_ger_regional AS agr using(asgr_cd_usuario)
