@@ -117,12 +117,12 @@ def etl_cadastro_uc(bucket, key):
                 fil.fili_cd_filial,
                 COALESCE(gr.codinome, 'ND')  AS gerente_regional,
                 COALESCE(gos.codinome, 'ND') AS gerente_operacional
-                -- COALESCE(s.supervisor, 'ND') AS supervisor
+                COALESCE(s.supervisor, 'ND') AS supervisor
             FROM filial AS fil
             LEFT JOIN assist_ger_regional AS agr using(asgr_cd_usuario)
             LEFT JOIN gerente_regional AS gr using(gere_cd_usuario)
             LEFT JOIN gerente_operacao AS gos using(geop_cd_usuario)
-            -- LEFT JOIN supervisor s ON fil.fili_cd_filial = s.fili_cd_filial
+            LEFT JOIN supervisor s ON fil.fili_cd_filial = s.fili_cd_filial
         ),
         estoque
         AS 
@@ -131,7 +131,7 @@ def etl_cadastro_uc(bucket, key):
                 ucp.ulch_sq_produto,
                 hr.gerente_regional,
                 hr.gerente_operacional,
-                -- hr.supervisor,
+                hr.supervisor,
                 ucp.fili_cd_filial                                AS filial,
                 ucp.prme_cd_produto                               AS cod_prod,
                 strip_accents(trim(categ.prme_tx_descricao))      AS nm_prod,
