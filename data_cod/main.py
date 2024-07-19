@@ -8,8 +8,6 @@ from google.cloud import storage
 import traceback
 from secret import access_secret_version
 import json
-from etl import etl_cadastro_uc
-
 
 SECRET_ID = os.environ['secret_id']
 PROJECT_IC = os.environ['project_id']
@@ -123,12 +121,6 @@ def transfer_database_uc(event, context):
 
         local_path = download_gcs(bucket, key)
         move_gcs_data(local_path, key)
-        
-        # ETL do cadastro UC
-        if key == files[0]:
-            print('Start - Cadastro UC')
-            etl_cadastro_uc(bucket, key)
-            print('End - Cadastro UC')
 
     except Exception as e:
         print(traceback.format_exc())
