@@ -1,6 +1,8 @@
 import duckdb
 import os
 from secret import access_secret_version
+import logging
+
 
 DB_ID = os.environ['db_id']
 DB_SECRET = os.environ['db_secret']
@@ -35,10 +37,14 @@ def etl_cadastro_uc(bucket, key):
             SECRET '{SECRET}'
     );
     """)
+
+    logging.info('Credenciais e conexao criada')
     
     # TODO: Anexar banco do GCS
     con.sql(f"ATTACH '{catalog}' AS ultima_chance (READ_ONLY);")
     con.sql("USE ultima_chance;")
+
+    logging.info(f'Db: {catalog} associado')
 
     # TODO: Criar tabela de conversao dos meses
     con.sql("""
@@ -65,6 +71,8 @@ def etl_cadastro_uc(bucket, key):
 		    ('December','Dezembro')
         ]
     )
+
+    logging.info("Tabela: 'month_brazilian' criada e dados inseridos")
 
     # TODO: Criar macro de perdas
     con.sql("""
@@ -146,6 +154,7 @@ def etl_cadastro_uc(bucket, key):
                 pf.prfi_qt_estoqatual                             AS qtd_estoque_loja,
                 pf.prfi_qt_estindisp                              AS qtd_estoque_indisponivel_loja,
                 pf.prfi_vl_cmpcsicms                              AS preco_unit,
+                ulch_dt_vencimento                                AS dt_vencimento,
                 concat(
                 (SELECT nome FROM memory.month_brazilian WHERE name = monthname(ulch_dt_vencimento))
                 , ' de ', 
@@ -200,9 +209,13 @@ def etl_cadastro_uc(bucket, key):
     );
     """)
 
+    logging.info('Inicio exportacao base CADASTRO')
+
     # TODO: Exportar cadastro
     con.sql(f"""
         COPY (FROM resumo_estoque())
 	    TO '{catalog_to}' (HEADER, DELIMITER ';');
     """
     )
+
+    logging.info(f'Base: {catalog_to} exportada !')

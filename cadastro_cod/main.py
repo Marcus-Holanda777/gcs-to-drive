@@ -1,16 +1,21 @@
 import traceback
 from etl import etl_cadastro_uc
+import logging
+
+logging.basicConfig(
+    format='%(asctime)s %(message)s', 
+    datefmt='%d/%m/%Y %H:%M:%S %p',
+    level=logging.INFO
+)
 
 
 def gera_cadastro_uc(event, context):
     bucket = event['bucket']
     key = event['name']
 
-    files = [
-        'ULTIMA_CHANCE/data.duckdb', 
-    ]
+    file = 'data.duckdb'
 
-    if key not in files:
+    if key != file:
         return
 
     try:

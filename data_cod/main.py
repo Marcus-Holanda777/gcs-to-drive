@@ -8,6 +8,13 @@ from google.cloud import storage
 import traceback
 from secret import access_secret_version
 import json
+import logging
+
+logging.basicConfig(
+    format='%(asctime)s %(message)s', 
+    datefmt='%d/%m/%Y %H:%M:%S %p',
+    level=logging.INFO
+)
 
 SECRET_ID = os.environ['secret_id']
 PROJECT_IC = os.environ['project_id']
@@ -29,7 +36,7 @@ def download_gcs(
     key: str
 ) -> str:
         
-    print(f"Downloading key: {key} in bucket: {bucket}")
+    logging.info(f"Downloading key: {key} in bucket: {bucket}")
     client = storage.Client.from_service_account_info(JSON_DICT)
     
     source_bucket = client.bucket(bucket)
@@ -56,7 +63,7 @@ def delete_files(service, name):
 
     for file in files:
         service.files().delete(fileId=file['id']).execute()
-        print(f"Deleted {file['name']} (ID: {file['id']})")
+        logging.info(f"Deleted {file['name']} (ID: {file['id']})")
 
 
 def move_gcs_data(
@@ -96,9 +103,9 @@ def move_gcs_data(
         while response is None:
             status, response = file.next_chunk()
             if status:
-                print(f"Uploaded {int(status.progress() * 100):02d} %")
+                logging.info(f"Uploaded {int(status.progress() * 100):02d} %")
 
-        print(f'As Completed .. {name} 100 %')
+        logging.info(f'As Completed .. {name} 100 %')
 
     except HttpError as e:
         print(traceback.format_exc())
@@ -109,12 +116,12 @@ def transfer_database_uc(event, context):
     key = event['name']
 
     files = [
-        'ULTIMA_CHANCE/data.duckdb', 
-        'RESSARCIMENTO/ressarcimento.duckdb'
+        'data.duckdb',
+        'ressarcimento.duckdb',
+        'cadastro.csv',
     ]
 
     if key not in files:
-        print(f'[NOT COPY] Key -- {key}')
         return
 
     try:
