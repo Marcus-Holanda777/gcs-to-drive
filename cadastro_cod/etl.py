@@ -112,12 +112,12 @@ def etl_cadastro_uc(bucket, key):
                 n3.capn_ds_categoria     AS n03,
                 uc.capn_tp_ultima_chance AS cat_uc,
                 forn.forn_nm_fantasia    AS forn_nm
-            FROM produto_mestre          AS pm
-            INNER JOIN fornecedor AS forn using(forn_cd_fornecedor)
-            LEFT JOIN categoria_produto_novo AS n1 ON SUBSTRING(pm.capn_cd_categoria, 1, 1) || '.000.000.00.00.00.00.00' = n1.capn_cd_categoria
-            LEFT JOIN categoria_produto_novo AS n2 ON SUBSTRING(pm.capn_cd_categoria, 1, 5) || '.000.00.00.00.00.00' = n2.capn_cd_categoria
-            LEFT JOIN categoria_produto_novo AS n3 ON SUBSTRING(pm.capn_cd_categoria, 1, 9) || '.00.00.00.00.00' = n3.capn_cd_categoria
-            LEFT JOIN categoria_produto_novo AS uc ON pm.capn_cd_categoria = uc.capn_cd_categoria
+            FROM cosmos_v14b_dbo_produto_mestre AS pm
+            INNER JOIN cosmos_v14b_dbo_fornecedor AS forn using(forn_cd_fornecedor)
+            LEFT JOIN cosmos_v14b_dbo_categoria_produto_novo AS n1 ON SUBSTRING(pm.capn_cd_categoria, 1, 1) || '.000.000.00.00.00.00.00' = n1.capn_cd_categoria
+            LEFT JOIN cosmos_v14b_dbo_categoria_produto_novo AS n2 ON SUBSTRING(pm.capn_cd_categoria, 1, 5) || '.000.00.00.00.00.00' = n2.capn_cd_categoria
+            LEFT JOIN cosmos_v14b_dbo_categoria_produto_novo AS n3 ON SUBSTRING(pm.capn_cd_categoria, 1, 9) || '.00.00.00.00.00' = n3.capn_cd_categoria
+            LEFT JOIN cosmos_v14b_dbo_categoria_produto_novo AS uc ON pm.capn_cd_categoria = uc.capn_cd_categoria
         ),
         hierarquia
         AS (
@@ -126,10 +126,10 @@ def etl_cadastro_uc(bucket, key):
                 COALESCE(gr.codinome, 'ND')  AS gerente_regional,
                 COALESCE(gos.codinome, 'ND') AS gerente_operacional,
                 COALESCE(s.supervisor, 'ND') AS supervisor
-            FROM filial AS fil
-            LEFT JOIN assist_ger_regional AS agr using(asgr_cd_usuario)
-            LEFT JOIN gerente_regional AS gr using(gere_cd_usuario)
-            LEFT JOIN gerente_operacao AS gos using(geop_cd_usuario)
+            FROM cosmos_v14b_dbo_filial AS fil
+            LEFT JOIN cosmos_v14b_dbo_assist_ger_regional AS agr using(asgr_cd_usuario)
+            LEFT JOIN cosmos_v14b_dbo_gerente_regional AS gr using(gere_cd_usuario)
+            LEFT JOIN cosmos_v14b_dbo_gerente_operacao AS gos using(geop_cd_usuario)
             LEFT JOIN supervisor s ON fil.fili_cd_filial = s.fili_cd_filial
         ),
         estoque
@@ -168,9 +168,9 @@ def etl_cadastro_uc(bucket, key):
                     strftime(ucp.ulch_dt_vencimento - INTERVAL 1 MONTH, '%Y-%m-18')::timestamp
                     ELSE ucp.ulch_dt_vencimento + INTERVAL 14 DAYS	
                 END::date AS recolher
-            FROM ultima_chance_produto as ucp
-            inner join categorias     as categ using(prme_cd_produto)
-            inner join produto_filial as pf on ucp.fili_cd_filial = pf.fili_cd_filial and ucp.prme_cd_produto = pf.prme_cd_produto
+            FROM cosmos_v14b_dbo_ultima_chance_produto as ucp
+            inner join categorias                      as categ using(prme_cd_produto)
+            inner join cosmos_v14b_dbo_produto_filial  as pf on ucp.fili_cd_filial = pf.fili_cd_filial and ucp.prme_cd_produto = pf.prme_cd_produto
             inner join hierarquia     AS hr on ucp.fili_cd_filial = hr.fili_cd_filial
             -- RECOLHIMENTO MAIOR OU IGUAL A DATA DE HOJE
             WHERE 
