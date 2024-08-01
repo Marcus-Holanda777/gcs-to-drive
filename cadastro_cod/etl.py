@@ -83,7 +83,7 @@ def etl_cadastro_uc(bucket, key):
         as
         (
             PIVOT (
-            FROM ultima_chance_kardex
+            FROM cosmos_v14b_dbo_ultima_chance_kardex
             WHERE filtro IS NULL OR ulch_dh_movimentacao <= filtro::TIMESTAMP
             )
             ON ulch_fl_tipo_movimentacao in('S', 'E')
@@ -94,8 +94,8 @@ def etl_cadastro_uc(bucket, key):
         AS 
         ( 
             PIVOT (
-                FROM ultima_chance_autorizacao
-                WHERE filtro IS NULL 
+                FROM cosmos_v14b_dbo_ultima_chance_autorizacao
+                WHERE filtro IS NULL
                 OR COALESCE(ulch_dh_venda, ulch_dh_cancelamento, xxxx_dh_alt, xxxx_dh_cad) <= filtro::TIMESTAMP
             )
             ON ulch_fl_situacao in('A', 'C', 'F', 'U', 'V')
