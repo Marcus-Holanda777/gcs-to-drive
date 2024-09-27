@@ -106,6 +106,12 @@ def move_gcs_data(
                 logging.info(f"Uploaded {int(status.progress() * 100):02d} %")
 
         logging.info(f'As Completed .. {name} 100 %')
+        
+        # CACHE CLEAR
+        delete_files(service, name)
+        os.unlink(local_path)
+
+        logging.info(f'As Cache Clear .. {local_path}')
 
     except HttpError as e:
         print(traceback.format_exc())
