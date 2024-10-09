@@ -108,8 +108,9 @@ def move_gcs_data(
         logging.info(f'As Completed .. {name} 100 %')
         
         # CACHE CLEAR
-        os.unlink(local_path)
-        logging.info(f'As Cache Clear .. {local_path}')
+        if os.path.isfile(local_path):
+            os.unlink(local_path)
+            logging.info(f'As Cache Clear .. {local_path}')
 
     except HttpError as e:
         print(traceback.format_exc())
@@ -121,7 +122,6 @@ def transfer_database_uc(event, context):
 
     files = [
         'data.duckdb',
-        'ressarcimento.duckdb',
         'cadastro.csv',
     ]
 
